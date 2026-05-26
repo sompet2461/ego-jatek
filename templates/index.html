@@ -55,7 +55,7 @@
 <body>
     <h1>EGO</h1>
     <p>Ismerd meg magad és testvéreidet!</p>
-    <input type="text" id="nev" placeholder="Hogyan hívnak mo" />
+    <input type="text" id="nev" placeholder="Ide írd be a neved..." />
     <button onclick="csatlakozas()">Csatlakozás</button>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -65,7 +65,7 @@
     function csatlakozas() {
         const nev = document.getElementById('nev').value;
         if (nev.trim() === '') {
-            alert('nebasszálfel mi a neved');
+            alert('Meg kell kell adnod egy nevet!');
             return;
         }
         localStorage.setItem('nev', nev);
