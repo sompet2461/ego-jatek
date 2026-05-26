@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGO – Várakozás</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 { font-size: 48px; color: #e94560; margin-bottom: 10px; }
+        h2 { font-size: 24px; color: #aaaaaa; margin-bottom: 30px; }
+        #jatekosok-lista {
+            list-style: none;
+            margin-bottom: 30px;
+            width: 300px;
+        }
+        #jatekosok-lista li {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            text-align: center;
+        }
+        button {
+            width: 300px;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            background: #e94560;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+        }
+        button:hover { background: #c73652; }
+        #varakozas {
+            color: #aaaaaa;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>EGO</h1>
+    <h2>Várakozó szoba</h2>
+    <ul id="jatekosok-lista"></ul>
+    <p id="varakozas">Várakozás a többi játékosra...</p>
+    <button id="indit-gomb" onclick="inditJatek()">Játék indítása!</button>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const socket = io();
+    const nev = localStorage.getItem('nev');
+
+    if (!nev) {
+        window.location.href = '/';
+    } else {
+        socket.emit('csatlakozas', { nev: nev });
+    }
+
+    socket.on('jatekosok_frissitese', (data) => {
+        const lista = document.getElementById('jatekosok-lista');
+        lista.innerHTML = '';
+        data.jatekosok.forEach(j => {
+            const li = document.createElement('li');
+            li.textContent = j.nev + ' – ' + j.zsetonok + ' zseton';
+            lista.appendChild(li);
+        });
+
+        if (data.gazda) {
+            document.getElementById('indit-gomb').style.display = 'block';
+            document.getElementById('varakozas').style.display = 'none';
+        }
+    });
+
+    socket.on('jatek_indul', () => {
+        window.location.href = '/jatek';
+    });
+
+    function inditJatek() {
+        socket.emit('jatek_inditasa');
+    }
+</script>
+</body>
+</html>

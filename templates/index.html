@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGO – Társasjáték</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 72px;
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 18px;
+            color: #aaaaaa;
+            margin-bottom: 40px;
+        }
+        input {
+            width: 300px;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+            background: #16213e;
+            color: white;
+            text-align: center;
+        }
+        button {
+            width: 300px;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            background: #e94560;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background: #c73652; }
+    </style>
+</head>
+<body>
+    <h1>EGO</h1>
+    <p>Ismerd meg magad és barátaidat!</p>
+    <input type="text" id="nev" placeholder="A te neved..." />
+    <button onclick="csatlakozas()">Csatlakozás</button>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    function csatlakozas() {
+        const nev = document.getElementById('nev').value;
+        if (nev.trim() === '') {
+            alert('Add meg a neved!');
+            return;
+        }
+        localStorage.setItem('nev', nev);
+        window.location.href = '/lobby';
+    }
+</script>
+</body>
+</html>

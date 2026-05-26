@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGO – Játék</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 { font-size: 36px; color: #e94560; margin-bottom: 10px; text-align: center; }
+        h2 { font-size: 20px; color: #aaaaaa; margin-bottom: 20px; text-align: center; }
+        #zseton-allás {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .zseton-info {
+            background: #16213e;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .zseton-info.tabla { color: yellow; }
+        #tartalom {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #kerdes {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .valasz-gomb {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 2px solid #16213e;
+            background: #16213e;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .valasz-gomb:hover { border-color: #e94560; }
+        .valasz-gomb.kivalasztott { 
+    border-color: #e94560; 
+    background: #e94560;
+    color: white;
+    font-weight: bold;
+}
+        button#tovabb {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            border: none;
+            background: #e94560;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+        }
+        button#tovabb:hover { background: #c73652; }
+        #varakozas-uzenet {
+            color: #aaaaaa;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .eredmeny-sor {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .helyes { background: #1a3a2a; color: #00ff88; }
+        .helytelen { background: #3a1a1a; color: #ff4444; }
+    </style>
+</head>
+<body>
+    <h1 id="cim">EGO</h1>
+    <h2 id="alcim">Töltés...</h2>
+
+    <div id="zseton-allás"></div>
+    <div id="tartalom"></div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const nev = localStorage.getItem('nev');
+        let kivalasztott = null;
+
+        if (!nev) window.location.href = '/';
+
+        socket.emit('jatek_csatlakozas', { nev: nev });
+
+        // Zseton állás frissítése
+        function frissitZsetonAllas(jatekosok, tabla) {
+            const div = document.getElementById('zseton-allás');
+            div.innerHTML = `<div class="zseton-info tabla">Tábla: ${tabla}</div>`;
+            jatekosok.forEach(j => {
+                div.innerHTML += `<div class="zseton-info">${j.nev}: ${j.zsetonok}</div>`;
+            });
+        }
+
+        // Kérdés képernyő
+        socket.on('kerdes_kepernyo', (data) => {
+            kivalasztott = null;
+            document.getElementById('cim').textContent = data.aktiv + ' van soron!';
+            document.getElementById('alcim').textContent = 'Válaszd ki a választ!';
+            frissitZsetonAllas(data.jatekosok, data.tabla);
+
+            const tartalom = document.getElementById('tartalom');
+            tartalom.innerHTML = `<p id="kerdes">${data.kerdes}</p>`;
+
+            if (data.aktiv === nev) {
+    data.valaszok.forEach((v, i) => {
+        const gomb = document.createElement('button');
+        gomb.className = 'valasz-gomb';
+        gomb.textContent = `${i+1}. ${v}`;
+        gomb.addEventListener('click', () => valasztas(i+1, gomb));
+        tartalom.appendChild(gomb);
+    });
+    const tovabb = document.createElement('button');
+    tovabb.id = 'tovabb';
+    tovabb.textContent = 'Zseton lefordítva →';
+    tovabb.style.display = 'none';
+    tovabb.addEventListener('click', valasztasKuldes);
+    tartalom.appendChild(tovabb);
+}
+            
+            else {
+                data.valaszok.forEach((v, i) => {
+                    tartalom.innerHTML += `
+                        <button class="valasz-gomb" disabled>
+                            ${i+1}. ${v}
+                        </button>`;
+                });
+                tartalom.innerHTML += `<p id="varakozas-uzenet">${data.aktiv} választ...</p>`;
+            }
+        });
+
+        function valasztas(szam, gomb) {
+    kivalasztott = szam;
+    document.querySelectorAll('.valasz-gomb').forEach(g => g.classList.remove('kivalasztott'));
+    gomb.classList.add('kivalasztott');
+    const tovabb = document.getElementById('tovabb');
+    if (tovabb) tovabb.style.display = 'block';
+}
+        
+
+        function valasztasKuldes() {
+            if (!kivalasztott) return;
+            socket.emit('sajat_valasz', { valasz: kivalasztott });
+        }
+
+        // Tippelés képernyő
+        socket.on('tippeles_kepernyo', (data) => {
+            kivalasztott = null;
+            document.getElementById('cim').textContent = 'Mit gondoltok?';
+            document.getElementById('alcim').textContent = data.aktiv + ' választott – ti mit tippeltek?';
+            frissitZsetonAllas(data.jatekosok, data.tabla);
+
+            const tartalom = document.getElementById('tartalom');
+            tartalom.innerHTML = `<p id="kerdes">${data.kerdes}</p>`;
+
+            if (data.aktiv === nev) {
+                tartalom.innerHTML += `<p id="varakozas-uzenet">Várd meg amíg a többiek tippelnek...</p>`;
+            } else {
+                data.valaszok.forEach((v, i) => {
+                    tartalom.innerHTML += `
+                        <button class="valasz-gomb" onclick="tippKivalaszt(${i+1}, this)">
+                            ${i+1}. ${v}
+                        </button>`;
+                });
+
+                tartalom.innerHTML += `
+                    <p style="margin-top:20px; color:#aaaaaa;">Téted (1-2 zseton):</p>
+                    <div style="display:flex; gap:15px; margin-top:10px;">
+                        <button class="valasz-gomb" id="tet1" onclick="tetKivalaszt(1)" style="width:auto; padding:10px 30px;">1</button>
+                        <button class="valasz-gomb" id="tet2" onclick="tetKivalaszt(2)" style="width:auto; padding:10px 30px;">2</button>
+                    </div>
+                    <button id="tovabb" style="display:block; margin-top:20px;" onclick="tippKuldes()">Tipp elküldése →</button>`;
+            }
+        });
+
+        let kivalasztottTipp = null;
+        let kivalasztottTet = 1;
+
+        function tippKivalaszt(szam, gomb) {
+            kivalasztottTipp = szam;
+            document.querySelectorAll('.valasz-gomb').forEach(g => g.classList.remove('kivalasztott'));
+            gomb.classList.add('kivalasztott');
+        }
+
+        function tetKivalaszt(szam) {
+            kivalasztottTet = szam;
+            document.getElementById('tet1').classList.remove('kivalasztott');
+            document.getElementById('tet2').classList.remove('kivalasztott');
+            document.getElementById('tet' + szam).classList.add('kivalasztott');
+        }
+
+        function tippKuldes() {
+            if (!kivalasztottTipp) { alert('Válassz egy tippet!'); return; }
+            socket.emit('tipp_elkuldese', { tipp: kivalasztottTipp, tet: kivalasztottTet });
+            document.getElementById('tovabb').style.display = 'none';
+            document.getElementById('tartalom').innerHTML += `<p id="varakozas-uzenet">Tipp elküldve! Várakozás...</p>`;
+        }
+
+        // Eredmény képernyő
+        socket.on('eredmeny_kepernyo', (data) => {
+            document.getElementById('cim').textContent = 'Eredmény';
+            document.getElementById('alcim').textContent = `${data.aktiv} választása: ${data.sajat_valasz}. – ${data.valaszok[data.sajat_valasz - 1]}`;
+            frissitZsetonAllas(data.jatekosok, data.tabla);
+
+            const tartalom = document.getElementById('tartalom');
+            tartalom.innerHTML = '';
+
+            data.eredmenyek.forEach(e => {
+                const div = document.createElement('div');
+                div.className = 'eredmeny-sor ' + (e.helyes ? 'helyes' : 'helytelen');
+                div.textContent = e.helyes
+                    ? `✓ ${e.nev} eltalálta! +${e.nyeremeny} zseton`
+                    : `✗ ${e.nev} nem találta el. -${e.tet} zseton`;
+                tartalom.appendChild(div);
+            });
+
+            if (data.tabla <= 0) {
+                const gyoztes = data.jatekosok.reduce((a, b) => a.zsetonok > b.zsetonok ? a : b);
+                tartalom.innerHTML += `<p style="color:#e94560; font-size:24px; margin-top:20px; text-align:center;">🎉 A győztes: ${gyoztes.nev}!</p>`;
+            } else if (nev === data.aktiv) {
+                tartalom.innerHTML += `<button id="tovabb" style="display:block; margin-top:20px;" onclick="kovetkezoKor()">Következő kör →</button>`;
+            } else {
+                tartalom.innerHTML += `<p id="varakozas-uzenet">${data.aktiv} indítja a következő kört...</p>`;
+            }
+        });
+
+        function kovetkezoKor() {
+            socket.emit('kovetkezo_kor');
+        }
+    </script>
+</body>
+</html>
