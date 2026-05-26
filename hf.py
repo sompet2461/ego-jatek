@@ -466,6 +466,19 @@ def reset():
     jatekterem['tetek'] = {}
     return "Játék nullázva!"
 
+@app.route('/reset_es_fooldal')
+def reset_es_fooldal():
+    jatekterem['jatekosok'] = []
+    jatekterem['tabla_zsetonok'] = 0
+    jatekterem['aktualis'] = 0
+    jatekterem['allapot'] = 'varakozas'
+    jatekterem['aktualis_kerdes'] = None
+    jatekterem['sajat_valasz'] = None
+    jatekterem['tippek'] = {}
+    jatekterem['tetek'] = {}
+    return render_template('index.html')
+```
+
 @socketio.on('csatlakozas')
 def csatlakozas(data):
     nev = data['nev']
