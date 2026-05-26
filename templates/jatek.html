@@ -228,7 +228,7 @@
 
         // Eredmény képernyő
         socket.on('eredmeny_kepernyo', (data) => {
-            console.log('tabla:', data.tabla);
+            console.log('tabla <= 0:', data.tabla <= 0);
             document.getElementById('cim').textContent = 'Eredmény';
             document.getElementById('alcim').textContent = `${data.aktiv} választása: ${data.sajat_valasz}. – ${data.valaszok[data.sajat_valasz - 1]}`;
             frissitZsetonAllas(data.jatekosok, data.tabla);
@@ -265,9 +265,14 @@
             }
         });
 
+socket.on('redirect', (data) => {
+    window.location.href = data.url;
+});
+
         function kovetkezoKor() {
             socket.emit('kovetkezo_kor');
         }
+
     </script>
 </body>
 </html>

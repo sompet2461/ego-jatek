@@ -477,7 +477,6 @@ def reset_es_fooldal():
     jatekterem['tippek'] = {}
     jatekterem['tetek'] = {}
     return render_template('index.html')
-```
 
 @socketio.on('csatlakozas')
 def csatlakozas(data):
@@ -518,17 +517,18 @@ def jatek_csatlakozas(data):
     nev = data['nev']
     join_room('jatek')
     
-    # Frissítjük a játékos sid-jét
     for j in jatekterem['jatekosok']:
         if j['nev'] == nev:
             j['sid'] = request.sid
             break
     
-    # Csak akkor küldünk új kérdést ha még nincs aktív kérdés
+    if len(jatekterem['jatekosok']) == 0:
+        emit('redirect', {'url': '/'}, to=request.sid)
+        return
+    
     if jatekterem['aktualis_kerdes'] is None:
         kuldd_kerdes_kepernyo()
     else:
-        # Küldjük az aktuális állapotot
         aktiv = jatekterem['jatekosok'][jatekterem['aktualis']]
         kerdes = jatekterem['aktualis_kerdes']
         if jatekterem['allapot'] == 'kerdes':
@@ -612,6 +612,9 @@ def szamol_eredmeny():
 
     aktiv['zsetonok'] += helyes_tippek
     jatekterem['tabla_zsetonok'] -= helyes_tippek
+
+    if jatekterem['tabla_zsetonok'] < 0:
+        jatekterem['tabla_zsetonok'] = 0
 
     kerdes = jatekterem['aktualis_kerdes']
     emit('eredmeny_kepernyo', {
