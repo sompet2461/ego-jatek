@@ -228,6 +228,7 @@
 
         // Eredmény képernyő
         socket.on('eredmeny_kepernyo', (data) => {
+            console.log('tabla:', data.tabla);
             document.getElementById('cim').textContent = 'Eredmény';
             document.getElementById('alcim').textContent = `${data.aktiv} választása: ${data.sajat_valasz}. – ${data.valaszok[data.sajat_valasz - 1]}`;
             frissitZsetonAllas(data.jatekosok, data.tabla);
@@ -247,6 +248,16 @@
             if (data.tabla <= 0) {
                 const gyoztes = data.jatekosok.reduce((a, b) => a.zsetonok > b.zsetonok ? a : b);
                 tartalom.innerHTML += `<p style="color:#e94560; font-size:24px; margin-top:20px; text-align:center;">🎉 A győztes: ${gyoztes.nev}!</p>`;
+                const ujJatek = document.createElement('button');
+                ujJatek.id = 'tovabb';
+                ujJatek.style.display = 'block';
+                ujJatek.style.marginTop = '20px';
+                ujJatek.textContent = 'Új játék!';
+                ujJatek.addEventListener('click', () => {
+                    localStorage.clear();
+                    window.location.href = '/reset_es_fooldal';
+                });
+                tartalom.appendChild(ujJatek);
             } else if (nev === data.aktiv) {
                 tartalom.innerHTML += `<button id="tovabb" style="display:block; margin-top:20px;" onclick="kovetkezoKor()">Következő kör →</button>`;
             } else {
