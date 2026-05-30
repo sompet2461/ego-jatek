@@ -417,6 +417,14 @@ kerdesek = [
             "Általában nem emlékszem az álmaimra"
         ]
     },
+    {
+        "kerdes": "Darti rendes?",
+        "valaszok": [
+            "Igge",
+            "Billeg",
+            "Kizárt"
+        ]
+    },
 ]
 
 
