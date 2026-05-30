@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import random
 import os
+from flask import Flask, render_template, request, send_from_directory
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ego_jatek_2024'
@@ -478,6 +479,14 @@ def reset_es_fooldal():
     jatekterem['tetek'] = {}
     return render_template('index.html')
 
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('.', 'manifest.json')
+
+@app.route('/service-worker.js')
+def service_worker():
+    return send_from_directory('static', 'service-worker.js')
+
 @socketio.on('csatlakozas')
 def csatlakozas(data):
     nev = data['nev']
@@ -508,7 +517,7 @@ def csatlakozas(data):
 
 @socketio.on('jatek_inditasa')
 def jatek_inditasa():
-    jatekterem['tabla_zsetonok'] = len(jatekterem['jatekosok']) * 10
+    jatekterem['tabla_zsetonok'] = len(jatekterem['jatekosok']) * 25
     jatekterem['allapot'] = 'kerdes'
     emit('jatek_indul', {}, to='jatek')
 
