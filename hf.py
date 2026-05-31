@@ -473,6 +473,22 @@ kerdesek = [
             "Fiola Attila"
         ]
     },
+    {
+        "kerdes": "Szerinted hány jelenlegi Tárnok-játékost tudsz fejből felsorolni?",
+        "valaszok": [
+            "Ötnél kevesebbet",
+            "Ötnél többet, de tíznél kevesebbet",
+            "Tíznél többet"
+        ]
+    },
+    {
+        "kerdes": "Melyik Muskétás-szimpatizánssal indulnál el szívesebben egy világ körüli útra?",
+        "valaszok": [
+            "Tikus",
+            "Atti",
+            "Norka"
+        ]
+    },
 ]
 
 
