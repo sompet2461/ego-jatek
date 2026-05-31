@@ -425,6 +425,54 @@ kerdesek = [
             "Kizárt"
         ]
     },
+    {
+        "kerdes": "Szerinted ki az elmúlt 20 év legjobb Fradi-edzője?",
+        "valaszok": [
+            "Thomas Doll",
+            "Szerhij Rebrov",
+            "Robbie Keane"
+        ]
+    },
+    {
+        "kerdes": "Melyik csapatban játszanál szívesebben?",
+        "valaszok": [
+            "Újpesten legendaként",
+            "Fradi II-ben stabil kezdőként",
+            "Győrben rotációs játékosként"
+        ]
+    },
+    {
+        "kerdes": "Hol laknál a legszívesebben?",
+        "valaszok": [
+            "Ercsiben",
+            "Érd Ófaluban",
+            "Újpesten"
+        ]
+    },
+    {
+        "kerdes": "Szerinted hány jelenlegi Fradi-játékost tudsz fejből felsorolni?",
+        "valaszok": [
+            "Ötnél kevesebbet",
+            "Ötnél többet, de tíznél kevesebbet",
+            "Tíznél többet"
+        ]
+    },
+    {
+        "kerdes": "Kivel innál meg leginkább egy hideg sörikét?",
+        "valaszok": [
+            "Gyurcsány Ferenccel",
+            "Nathan Aspinallal",
+            "Nagy Feróval"
+        ]
+    },
+    {
+        "kerdes": "Melyik utolsó büdös faszszopó köcsög gecit ölnéd meg a legtöbb késszúrással?",
+        "valaszok": [
+            "Krausz Dominika",
+            "Bitó Sándor",
+            "Fiola Attila"
+        ]
+    },
 ]
 
 
