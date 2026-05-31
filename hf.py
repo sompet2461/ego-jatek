@@ -436,13 +436,25 @@ jatekterem = {
     "aktualis_kerdes": None,
     "sajat_valasz": None,
     "tippek": {},
-    "tetek": {}
+    "tetek": {},
+    "hasznalt_kerdesek": []
 }
 
 def kuldd_kerdes_kepernyo():
     aktiv = jatekterem['jatekosok'][jatekterem['aktualis']]
-    kerdes = random.choice(kerdesek)
+    
+    # Szűrjük ki a már használt kérdéseket
+    szabad_kerdesek = [k for k in kerdesek if k not in jatekterem['hasznalt_kerdesek']]
+    
+    # Ha elfogytak a kérdések, nullázzuk a listát
+    if not szabad_kerdesek:
+        jatekterem['hasznalt_kerdesek'] = []
+        szabad_kerdesek = kerdesek
+    
+    kerdes = random.choice(szabad_kerdesek)
+    jatekterem['hasznalt_kerdesek'].append(kerdes)
     jatekterem['aktualis_kerdes'] = kerdes
+    
     emit('kerdes_kepernyo', {
         'aktiv': aktiv['nev'],
         'kerdes': kerdes['kerdes'],
