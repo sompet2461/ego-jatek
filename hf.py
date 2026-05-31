@@ -601,7 +601,7 @@ def csatlakozas(data):
 
 @socketio.on('jatek_inditasa')
 def jatek_inditasa():
-    jatekterem['tabla_zsetonok'] = len(jatekterem['jatekosok']) * 25
+    jatekterem['tabla_zsetonok'] = len(jatekterem['jatekosok']) * 15
     jatekterem['allapot'] = 'kerdes'
     emit('jatek_indul', {}, to='jatek')
 
