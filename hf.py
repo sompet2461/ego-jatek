@@ -594,12 +594,7 @@ def sajat_valasz(data):
     }, to='jatek')
 
 @socketio.on('tipp_elkuldese')
-def tipp_elkuldese(data):           
-
-   
-    def tipp_elkuldese(data):
-        print("TIPP ÉRKEZETT:", data)
-
+def tipp_elkuldese(data):
     nev = None
     for j in jatekterem['jatekosok']:
         if j['sid'] == request.sid:
@@ -611,11 +606,21 @@ def tipp_elkuldese(data):
         jatekterem['tetek'][nev] = data['tet']
 
     aktiv = jatekterem['jatekosok'][jatekterem['aktualis']]
-    tippeloк = [j for j in jatekterem['jatekosok'] if j['nev'] != aktiv['nev']]
-    mindenki_tippelt = all(j['nev'] in jatekterem['tippek'] for j in tippeloк)
+    tippelek = [j for j in jatekterem['jatekosok'] if j['nev'] != aktiv['nev']]
+    
+    # Csak az online játékosokat várjuk
+    online_tippelek = [j for j in tippelek if j['sid'] is not None]
+    mindenki_tippelt = all(j['nev'] in jatekterem['tippek'] for j in online_tippelek)
 
     if mindenki_tippelt:
         szamol_eredmeny()
+
+@socketio.on('disconnect')
+def disconnect():
+    for j in jatekterem['jatekosok']:
+        if j['sid'] == request.sid:
+            j['sid'] = None
+            break
 
 def szamol_eredmeny():
     aktiv = jatekterem['jatekosok'][jatekterem['aktualis']]
